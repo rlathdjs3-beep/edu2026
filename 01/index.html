@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일본의 정체성: 언어와 문화 수업</title>
+    <style>
+        /* 기본 스타일 설정 */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+        
+        :root {
+            --primary-red: #ef4444;
+            --primary-dark: #1f2937;
+            --bg-gray: #f8f9fa;
+            --white: #ffffff;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-gray);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1024px;
+            margin: 0 auto;
+        }
+
+        /* 홈 버튼 */
+        .nav-top {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--white);
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #374151;
+            font-weight: bold;
+            transition: all 0.2s;
+            box-shadow: var(--shadow);
+        }
+
+        .home-btn:hover {
+            background: #f9fafb;
+        }
+
+        .home-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--primary-red);
+        }
+
+        /* 헤더 */
+        header {
+            text-align: center;
+            background: var(--white);
+            padding: 40px 20px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--primary-red);
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #111827;
+        }
+
+        /* 탭 디자인 */
+        .tab-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            padding: 10px 24px;
+            border: 1px solid #e5e7eb;
+            border-radius: 9999px;
+            background: var(--white);
+            cursor: pointer;
+            font-weight: bold;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-red);
+            border-color: #fecaca;
+            background: #fef2f2;
+            box-shadow: 0 0 0 2px var(--primary-red);
+        }
+
+        .tab-btn.quiz-btn {
+            background: var(--primary-red);
+            color: var(--white);
+            border: none;
+        }
+
+        .tab-btn.quiz-btn:hover {
+            background: #dc2626;
+        }
+
+        /* 콘텐츠 영역 */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid #f3f4f6;
+            margin-bottom: 20px;
+        }
+
+        /* 섹션 헤더 및 버튼 */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .open-modal-btn {
+            background: #4f46e5;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.1s;
+        }
+
+        .open-modal-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 그리드 레이아웃 */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .info-box {
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .bg-blue { background: #eff6ff; }
+        .bg-purple { background: #f5f3ff; }
+        .bg-green { background: #f0fdf4; }
+
+        /* 모달 스타일 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-container {
+            background: var(--white);
+            width: 100%;
+            max-width: 600px;
+            border-radius: 24px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 30px;
+            background: #f9fafb;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            text-align: right;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .primary-btn {
+            background: var(--primary-dark);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* 문자 테이블 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            border: 1px solid #eee;
+            text-align: left;
+        }
+
+        th { background: #f9fafb; }
+
+        /* 퀴즈 스타일 */
+        .quiz-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        .ans-btn {
+            width: 100%;
+            text-align: left;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .ans-btn:hover { background: #f9fafb; }
+        .ans-btn.correct { background: #dcfce7; border-color: #86efac; font-weight: bold; }
+        .ans-btn.incorrect { background: #fee2e2; border-color: #fca5a5; }
+
+        @media (max-width: 640px) {
+            header h1 { font-size: 1.4rem; }
+            .section-header { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 홈 버튼 -->
+        <div class="nav-top">
+            <a href="../index.html" class="home-btn">
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                </svg>
+                홈으로
+            </a>
+        </div>
+
+        <!-- 헤더 -->
+        <header>
+            <h1>🇯🇵 일본의 정체성을 담은 언어와 문화</h1>
+            <p>성씨의 유래부터 전통 생활 양식까지</p>
+        </header>
+
+        <!-- 탭 네비게이션 -->
+        <nav class="tab-nav">
+            <button onclick="showTab('origin')" class="tab-btn active">1. 성씨의 유래</button>
+            <button onclick="showTab('language')" class="tab-btn">2. 문자의 세계</button>
+            <button onclick="showTab('culture')" class="tab-btn">3. 전통 의복</button>
+            <button onclick="showTab('quiz')" class="tab-btn quiz-btn">📝 복습 퀴즈</button>
+        </nav>
+
+        <!-- 1. 성씨 유래 섹션 -->
+        <section id="origin" class="tab-content active">
+            <div class="card">
+                <div class="section-header">
+                    <h2>🏞️ 자연과 역사가 빚어낸 성씨</h2>
+                    <button onclick="openModal()" class="open-modal-btn">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        상세 유래 정보
+                    </button>
+                </div>
+                <p style="margin-bottom: 20px;">일본 성씨의 약 80%는 지형과 관련이 있습니다. 메이지 유신 이후 모든 평민이 성씨를 갖게 되면서 주변 환경을 이름으로 삼았기 때문입니다.</p>
+                <div class="grid-3">
+                    <div class="info-box bg-blue">
+                        <strong style="color: #2563eb; font-size: 0.8rem;">지형 유래</strong>
+                        <h3 style="font-size: 1.2rem; margin: 5px 0;">田中 (다나카)</h3>
+                        <p style="font-size: 0.9rem;">"밭(田)의 가운데(中)"라는 뜻의 대중적인 성씨입니다.</p>
+                    </div>
+                    <div class="info-box bg-purple">
+                        <strong style="color: #7c3aed; font-size: 0.8rem;">권력 가문</strong>
+                        <h3 style="font-size: 1.2rem; margin: 5px 0;">佐藤 (사토)</h3>
+                        <p style="font-size: 0.9rem;">귀족 가문 후지와라의 '등나무(藤)' 자를 딴 성씨입니다.</p>
+                    </div>
+                    <div class="info-box bg-green">
+                        <strong style="color: #16a34a; font-size: 0.8rem;">직업/신앙</strong>
+                        <h3 style="font-size: 1.2rem; margin: 5px 0;">鈴木 (스즈키)</h3>
+                        <p style="font-size: 0.9rem;">제사 도구인 방울(鈴)에서 유래한 유서 깊은 성씨입니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 문자 학습 섹션 -->
+        <section id="language" class="tab-content">
+            <div class="grid-3">
+                <div class="card" style="border-top: 4px solid #f472b6;">
+                    <h3 style="color: #db2777; margin-bottom: 10px;">히라가나 (平仮名)</h3>
+                    <ul style="list-style: none; font-size: 0.95rem;">
+                        <li>🌸 한자의 초서체를 변형</li>
+                        <li>🌸 부드러운 곡선 위주</li>
+                        <li>🌸 조사, 동사 활용에 사용</li>
+                    </ul>
+                </div>
+                <div class="card" style="border-top: 4px solid #60a5fa;">
+                    <h3 style="color: #2563eb; margin-bottom: 10px;">가타카나 (片仮名)</h3>
+                    <ul style="list-style: none; font-size: 0.95rem;">
+                        <li>⚡ 한자의 일부분에서 유래</li>
+                        <li>⚡ 직선적이고 강한 느낌</li>
+                        <li>⚡ 외래어, 강조 표현에 사용</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 전통 의복 섹션 -->
+        <section id="culture" class="tab-content">
+            <div class="card">
+                <h2 style="text-align: center; margin-bottom: 20px;">👘 기모노 vs 유카타</h2>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>구분</th>
+                                <th style="color: #ef4444;">기모노</th>
+                                <th style="color: #3b82f6;">유카타</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>소재</td>
+                                <td>비단 (고급)</td>
+                                <td>면 (가벼움)</td>
+                            </tr>
+                            <tr>
+                                <td>용도</td>
+                                <td>공식 석상, 관혼상제</td>
+                                <td>축제(마츠리), 온천</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. 퀴즈 섹션 -->
+        <section id="quiz" class="tab-content">
+            <div id="quiz-area"></div>
+            <div id="result-area" style="display: none; text-align: center; background: white; padding: 40px; border-radius: 20px; box-shadow: var(--shadow);">
+                <h2 style="margin-bottom: 10px;">🎉 결과 확인</h2>
+                <p id="final-score" style="font-size: 1.2rem; margin-bottom: 20px;"></p>
+                <button onclick="initQuiz()" class="primary-btn">다시 풀기</button>
+            </div>
+        </section>
+
+        <!-- 상세 정보 모달 -->
+        <div id="modal" class="modal-overlay" onclick="closeModalOnBg(event)">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <div>
+                        <h3 style="font-weight: bold;">일본 성씨의 상세 유래</h3>
+                        <p style="font-size: 0.8rem; color: #666;">지형과 역사가 담긴 이름</p>
+                    </div>
+                    <button onclick="closeModal()" class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="background: white; padding: 15px; border-radius: 12px; border-left: 4px solid #3b82f6; margin-bottom: 15px;">
+                        <h4 style="color: #1e40af; margin-bottom: 5px;">📍 지형 성씨 (약 80%)</h4>
+                        <p style="font-size: 0.85rem;">산, 강, 밭 등 집 주변의 풍경을 그대로 성씨로 사용했습니다. (예: 야마다, 나카무라)</p>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 12px; border-left: 4px solid #7c3aed; margin-bottom: 15px;">
+                        <h4 style="color: #5b21b6; margin-bottom: 5px;">📜 1875년 성씨 의무화</h4>
+                        <p style="font-size: 0.85rem;">메이지 정부의 법령에 의해 모든 평민이 성씨를 등록하게 되면서 다양한 성씨가 폭발적으로 늘어났습니다.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="closeModal()" class="primary-btn">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 탭 전환 기능 ---
+        function showTab(tabId) {
+            // 모든 콘텐츠 숨기기
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            // 선택한 콘텐츠 보이기
+            document.getElementById(tabId).classList.add('active');
+            
+            // 모든 버튼 비활성화 스타일
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            // 클릭한 버튼 활성화 스타일 (이벤트 위임 대신 간단히 처리)
+            event.currentTarget.classList.add('active');
+        }
+
+        // --- 모달 기능 ---
+        function openModal() {
+            const modal = document.getElementById('modal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        function closeModalOnBg(e) {
+            if (e.target.id === 'modal') closeModal();
+        }
+
+        // --- 퀴즈 기능 ---
+        const quizData = [
+            { q: "일본 성씨 중 '사토(佐藤)' 등에 포함된 '등나무(藤)' 자는 어느 가문과 관련있나요?", a: ["농민 가문", "후지와라 가문", "상인 가문"], c: 1 },
+            { q: "히라가나는 한자의 어떤 형태를 변형하여 만들었나요?", a: ["일부분(부수)", "초서체(흘림체)", "그림"], c: 1 },
+            { q: "가벼운 면 소재로 축제나 온천에서 주로 입는 옷은?", a: ["기모노", "유카타", "한복"], c: 1 }
+        ];
+
+        let score = 0;
+
+        function initQuiz() {
+            score = 0;
+            document.getElementById('result-area').style.display = 'none';
+            const quizArea = document.getElementById('quiz-area');
+            quizArea.style.display = 'block';
+            
+            quizArea.innerHTML = quizData.map((data, idx) => `
+                <div class="quiz-card">
+                    <p><strong>Q${idx+1}. ${data.q}</strong></p>
+                    ${data.a.map((ans, aIdx) => `
+                        <button class="ans-btn" id="q${idx}a${aIdx}" onclick="selectAns(${idx}, ${aIdx})">${ans}</button>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+
+        function selectAns(qIdx, aIdx) {
+            const correctIdx = quizData[qIdx].c;
+            const buttons = document.querySelectorAll(`[id^="q${qIdx}a"]`);
+            
+            // 버튼 비활성화
+            buttons.forEach(b => b.disabled = true);
+            
+            if(aIdx === correctIdx) {
+                document.getElementById(`q${qIdx}a${aIdx}`).classList.add('correct');
+                score++;
+            } else {
+                document.getElementById(`q${qIdx}a${aIdx}`).classList.add('incorrect');
+                document.getElementById(`q${qIdx}a${correctIdx}`).classList.add('correct');
+            }
+
+            // 모든 문제가 풀렸는지 확인
+            const answered = document.querySelectorAll('.ans-btn[disabled]').length / 3;
+            if(answered === quizData.length) {
+                setTimeout(() => {
+                    document.getElementById('quiz-area').style.display = 'none';
+                    document.getElementById('result-area').style.display = 'block';
+                    document.getElementById('final-score').innerText = `${quizData.length}문제 중 ${score}문제를 맞혔습니다!`;
+                }, 1000);
+            }
+        }
+
+        // 초기 실행
+        window.onload = initQuiz;
+    </script>
+</body>
+</html>
