@@ -60,6 +60,7 @@
 
         .home-btn:hover {
             background: #f9fafb;
+            transform: translateY(-1px);
         }
 
         .home-btn svg {
@@ -299,12 +300,13 @@
 </head>
 <body>
     <div class="container">
+        <!-- 상단 네비게이션: 홈 버튼 추가 -->
         <div class="nav-top">
-            <a href="#" class="home-btn">
+            <a href="../index.html" class="home-btn">
                 <svg viewBox="0 0 20 20" fill="currentColor">
                     <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                 </svg>
-                홈으로
+                홈
             </a>
         </div>
 
@@ -422,9 +424,6 @@
     </div>
 
     <script>
-        /**
-         * 바닐라 자바스크립트 로직
-         */
         document.addEventListener('DOMContentLoaded', () => {
             
             // 1. 탭 시스템
@@ -434,12 +433,8 @@
             tabButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
                     const targetId = btn.getAttribute('data-tab');
-                    
-                    // 모든 탭 비활성화
                     tabButtons.forEach(b => b.classList.remove('active'));
                     tabContents.forEach(c => c.classList.remove('active'));
-
-                    // 선택 탭 활성화
                     btn.classList.add('active');
                     document.getElementById(targetId).classList.add('active');
                 });
@@ -452,14 +447,12 @@
             const closeModalFooterBtn = document.querySelector('.close-modal-trigger');
             const infoImg = document.getElementById('infoImg');
 
-            // 이미지 로드 에러 처리 (바닐라 JS)
             infoImg.onerror = function() {
                 this.src = 'https://via.placeholder.com/800x600?text=04.png+Not+Found';
             };
 
             const openModal = () => {
                 modalOverlay.style.display = 'flex';
-                // 브라우저 렌더링 주기 확보를 위해 setTimeout 사용
                 setTimeout(() => modalOverlay.classList.add('active'), 10);
                 document.body.style.overflow = 'hidden';
             };
@@ -475,8 +468,6 @@
             infographicBtn.addEventListener('click', openModal);
             closeModalBtn.addEventListener('click', closeModal);
             closeModalFooterBtn.addEventListener('click', closeModal);
-            
-            // 배경 클릭 시 닫기
             modalOverlay.addEventListener('click', (e) => {
                 if (e.target === modalOverlay) closeModal();
             });
@@ -525,8 +516,6 @@
             const handleAnswer = (selectedBtn, qIdx, aIdx) => {
                 const correctAnswerIdx = quizData[qIdx].c;
                 const siblings = selectedBtn.parentNode.querySelectorAll('.ans-btn');
-                
-                // 해당 문제의 다른 버튼 비활성화
                 siblings.forEach(btn => btn.disabled = true);
 
                 if (aIdx === correctAnswerIdx) {
@@ -538,8 +527,6 @@
                 }
 
                 answeredCount++;
-
-                // 모든 문제 풀었을 때 결과창 노출
                 if (answeredCount === quizData.length) {
                     setTimeout(() => {
                         quizArea.style.display = 'none';
@@ -550,7 +537,7 @@
             };
 
             retryBtn.addEventListener('click', initQuiz);
-            initQuiz(); // 초기 실행
+            initQuiz();
         });
     </script>
 </body>
