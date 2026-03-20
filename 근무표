@@ -1,0 +1,397 @@
+import React, { useState, useMemo } from 'react';
+import { 
+  Users, 
+  Calendar, 
+  Clock, 
+  Plus, 
+  Trash2, 
+  Copy, 
+  Play, 
+  CheckCircle2, 
+  AlertCircle,
+  UserPlus,
+  ArrowRight
+} from 'lucide-react';
+
+/**
+ * 근태 관리 애플리케이션 메인 컴포넌트
+ * 조교, 동장, 봉사자, 직원의 근무를 공정하게 배분합니다.
+ */
+export default function App() {
+  // --- 상태 관리 ---
+  const [staffs, setStaffs] = useState([
+    { id: '1', name: '홍길동', role: '조교', prevHours: 10 },
+    { id: '2', name: '김철수', role: '동장', prevHours: 5 },
+  ]);
+
+  const [preferences, setPreferences] = useState([]); // { staffId, date, time, type: 'unavailable' | 'preferred' }
+  const [slots, setSlots] = useState([
+    { id: 's1', date: '2024-03-20', time: '09:00~11:00', task: '경비실', requiredRole: '조교' },
+  ]);
+
+  const [assignments, setAssignments] = useState({}); // { slotId: staffId }
+  const [isGenerated, setIsGenerated] = useState(false);
+
+  // --- 유틸리티 함수 ---
+  const addStaff = () => {
+    const newStaff = { id: crypto.randomUUID(), name: '', role: '조교', prevHours: 0 };
+    setStaffs([...staffs, newStaff]);
+  };
+
+  const updateStaff = (id, field, value) => {
+    setStaffs(staffs.map(s => s.id === id ? { ...s, [field]: value } : s));
+  };
+
+  const copyStaff = (staff) => {
+    setStaffs([...staffs, { ...staff, id: crypto.randomUUID(), name: `${staff.name} (복사)` }]);
+  };
+
+  const deleteStaff = (id) => setStaffs(staffs.filter(s => s.id !== id));
+
+  const addSlot = () => {
+    const newSlot = { id: crypto.randomUUID(), date: '', time: '', task: '', requiredRole: '조교' };
+    setSlots([...slots, newSlot]);
+  };
+
+  const updateSlot = (id, field, value) => {
+    setSlots(slots.map(s => s.id === id ? { ...s, [field]: value } : s));
+  };
+
+  const addPreference = (staffId) => {
+    setPreferences([...preferences, { id: crypto.randomUUID(), staffId, date: '', time: '', type: 'unavailable' }]);
+  };
+
+  const updatePreference = (id, field, value) => {
+    setPreferences(preferences.map(p => p.id === id ? { ...p, [field]: value } : p));
+  };
+
+  // --- 핵심 알고리즘: 공정 배분 로직 ---
+  const generateSchedule = () => {
+    const newAssignments = {};
+    // 직원의 현재 배정된 시간 추적 (실시간 계산용)
+    const currentSessionHours = {};
+    staffs.forEach(s => currentSessionHours[s.id] = 0);
+
+    // 1. 슬롯을 순회하며 배정
+    const sortedSlots = [...slots]; // 순서대로 배정 (필요시 정렬 가능)
+
+    sortedSlots.forEach(slot => {
+      if (slot.requiredRole === '없음') {
+        newAssignments[slot.id] = null;
+        return;
+      }
+
+      // 해당 슬롯에 배정 가능한 후보군 필터링
+      const candidates = staffs.filter(staff => {
+        // 1. 직군 일치 여부
+        if (staff.role !== slot.requiredRole) return false;
+
+        // 2. 해당 시간 중복 근무 체크 (이미 배정된 슬롯과 시간이 겹치는지 - 단순 구현을 위해 슬롯 ID 기준)
+        // 실제 운영시는 시간 문자열 파싱 필요
+
+        // 3. 불가 시간 체크
+        const isUnavailable = preferences.some(p => 
+          p.staffId === staff.id && 
+          p.date === slot.date && 
+          p.time === slot.time && 
+          p.type === 'unavailable'
+        );
+        return !isUnavailable;
+      });
+
+      if (candidates.length > 0) {
+        // 공정성 점수 계산 (누적 근무 시간 + 현재 세션 시간)
+        // 조교/동장은 이전 기록 합산, 직원/봉사자는 이번 세션만 고려
+        candidates.sort((a, b) => {
+          // 선호 시간 가중치
+          const aPref = preferences.some(p => p.staffId === a.id && p.date === slot.date && p.time === slot.time && p.type === 'preferred') ? -100 : 0;
+          const bPref = preferences.some(p => p.staffId === b.id && p.date === slot.date && p.time === slot.time && p.type === 'preferred') ? -100 : 0;
+
+          const aTotal = (['조교', '동장'].includes(a.role) ? (a.prevHours || 0) : 0) + currentSessionHours[a.id] + aPref;
+          const bTotal = (['조교', '동장'].includes(b.role) ? (b.prevHours || 0) : 0) + currentSessionHours[b.id] + bPref;
+          
+          return aTotal - bTotal;
+        });
+
+        const selected = candidates[0];
+        newAssignments[slot.id] = selected.id;
+        currentSessionHours[selected.id] += 1; // 1슬롯 당 1단위 시간 가산
+      } else {
+        newAssignments[slot.id] = 'unassigned';
+      }
+    });
+
+    setAssignments(newAssignments);
+    setIsGenerated(true);
+  };
+
+  // 통계 계산
+  const stats = useMemo(() => {
+    return staffs.map(staff => {
+      const assignedCount = Object.values(assignments).filter(id => id === staff.id).length;
+      return {
+        ...staff,
+        sessionHours: assignedCount,
+        totalHours: (['조교', '동장'].includes(staff.role) ? staff.prevHours : 0) + assignedCount
+      };
+    });
+  }, [staffs, assignments]);
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-900">
+      <div className="max-w-6xl mx-auto space-y-8">
+        
+        {/* 헤더 */}
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-6">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-800">근무 스케줄러 Pro</h1>
+            <p className="text-slate-500 mt-1">조교 및 동장 간의 공평한 근무 배분을 지원합니다.</p>
+          </div>
+          <button 
+            onClick={generateSchedule}
+            className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg active:scale-95"
+          >
+            <Play size={18} /> 최적 근무표 생성
+          </button>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* 왼쪽 컬럼: 설정 섹션 */}
+          <div className="lg:col-span-7 space-y-8">
+            
+            {/* 1. 직원 관리 */}
+            <section className="bg-white rounded-2xl shadow-sm border p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <Users className="text-indigo-500" /> 직원 정보 관리
+                </h2>
+                <button onClick={addStaff} className="text-sm flex items-center gap-1 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors">
+                  <UserPlus size={16} /> 직원 추가
+                </button>
+              </div>
+              
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b text-slate-400 text-sm">
+                      <th className="py-3 font-medium">이름</th>
+                      <th className="py-3 font-medium">직군</th>
+                      <th className="py-3 font-medium">이전 누적(h)</th>
+                      <th className="py-3 font-medium text-right">관리</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {staffs.map(staff => (
+                      <tr key={staff.id} className="border-b last:border-0 hover:bg-slate-50 group">
+                        <td className="py-3">
+                          <input 
+                            value={staff.name} 
+                            onChange={(e) => updateStaff(staff.id, 'name', e.target.value)}
+                            placeholder="이름 입력"
+                            className="bg-transparent border-none focus:ring-0 w-full p-0 font-medium"
+                          />
+                        </td>
+                        <td className="py-3">
+                          <select 
+                            value={staff.role} 
+                            onChange={(e) => updateStaff(staff.id, 'role', e.target.value)}
+                            className="bg-slate-100 border-none rounded-md text-xs py-1 px-2 focus:ring-2 focus:ring-indigo-500"
+                          >
+                            <option>조교</option>
+                            <option>동장</option>
+                            <option>봉사자</option>
+                            <option>직원</option>
+                          </select>
+                        </td>
+                        <td className="py-3">
+                          <input 
+                            type="number"
+                            disabled={!['조교', '동장'].includes(staff.role)}
+                            value={staff.prevHours} 
+                            onChange={(e) => updateStaff(staff.id, 'prevHours', parseInt(e.target.value) || 0)}
+                            className="w-16 bg-slate-50 border-none rounded-md text-sm py-1 px-2 disabled:opacity-30"
+                          />
+                        </td>
+                        <td className="py-3 text-right space-x-2">
+                          <button onClick={() => copyStaff(staff)} className="p-1 text-slate-400 hover:text-indigo-600 transition-colors"><Copy size={16}/></button>
+                          <button onClick={() => deleteStaff(staff.id)} className="p-1 text-slate-400 hover:text-red-600 transition-colors"><Trash2 size={16}/></button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            {/* 2. 선호/불가 시간 설정 */}
+            <section className="bg-white rounded-2xl shadow-sm border p-6">
+              <h2 className="text-xl font-bold flex items-center gap-2 mb-4">
+                <Calendar className="text-pink-500" /> 개인별 선호/불가 시간 (복수 설정)
+              </h2>
+              <div className="space-y-4">
+                {staffs.map(staff => (
+                  <div key={staff.id} className="p-4 bg-slate-50 rounded-xl">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-bold text-indigo-700">{staff.name} <small className="text-slate-400 font-normal">({staff.role})</small></span>
+                      <button onClick={() => addPreference(staff.id)} className="text-xs bg-white border px-2 py-1 rounded hover:bg-indigo-50 transition-colors">시간대 추가 +</button>
+                    </div>
+                    <div className="space-y-2">
+                      {preferences.filter(p => p.staffId === staff.id).map(p => (
+                        <div key={p.id} className="flex gap-2 items-center text-sm bg-white p-2 rounded-lg border">
+                          <input type="date" value={p.date} onChange={(e) => updatePreference(p.id, 'date', e.target.value)} className="border-none p-0 text-xs focus:ring-0 w-28" />
+                          <input type="text" placeholder="시간(수동)" value={p.time} onChange={(e) => updatePreference(p.id, 'time', e.target.value)} className="border-none p-0 text-xs focus:ring-0 w-24" />
+                          <select value={p.type} onChange={(e) => updatePreference(p.id, 'type', e.target.value)} className="border-none p-0 text-xs font-bold text-slate-600">
+                            <option value="unavailable">불가</option>
+                            <option value="preferred">선호</option>
+                          </select>
+                          <button onClick={() => setPreferences(preferences.filter(pref => pref.id !== p.id))} className="ml-auto text-slate-300 hover:text-red-500"><Trash2 size={14}/></button>
+                        </div>
+                      ))}
+                      {preferences.filter(p => p.staffId === staff.id).length === 0 && <p className="text-xs text-slate-400 italic">설정된 조건이 없습니다.</p>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          {/* 오른쪽 컬럼: 슬롯 및 결과 */}
+          <div className="lg:col-span-5 space-y-8">
+            
+            {/* 3. 업무 슬롯 설정 */}
+            <section className="bg-white rounded-2xl shadow-sm border p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <Clock className="text-emerald-500" /> 업무 슬롯 (요구사항)
+                </h2>
+                <button onClick={addSlot} className="text-sm flex items-center gap-1 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors">
+                  <Plus size={16} /> 슬롯 추가
+                </button>
+              </div>
+              <div className="max-h-[400px] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+                {slots.map(slot => (
+                  <div key={slot.id} className="p-3 border rounded-xl flex flex-col gap-2 relative group hover:border-indigo-200 transition-colors">
+                    <button onClick={() => setSlots(slots.filter(s => s.id !== slot.id))} className="absolute top-2 right-2 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 size={14}/></button>
+                    <div className="flex gap-2">
+                      <input type="date" value={slot.date} onChange={(e) => updateSlot(slot.id, 'date', e.target.value)} className="text-xs border-none p-0 focus:ring-0 w-1/2 font-medium" />
+                      <input type="text" placeholder="시간대(수동)" value={slot.time} onChange={(e) => updateSlot(slot.id, 'time', e.target.value)} className="text-xs border-none p-0 focus:ring-0 w-1/2 text-right" />
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <input placeholder="업무명 (예: 경비실)" value={slot.task} onChange={(e) => updateSlot(slot.id, 'task', e.target.value)} className="text-sm border-b focus:border-indigo-500 transition-colors w-full pb-1" />
+                      <select 
+                        value={slot.requiredRole} 
+                        onChange={(e) => updateSlot(slot.id, 'requiredRole', e.target.value)}
+                        className="text-xs bg-slate-50 border rounded p-1"
+                      >
+                        <option>조교</option>
+                        <option>동장</option>
+                        <option>봉사자</option>
+                        <option>직원</option>
+                        <option>없음</option>
+                      </select>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* 4. 생성 결과 요약 */}
+            {isGenerated && (
+              <section className="bg-indigo-900 text-white rounded-2xl shadow-xl p-6 overflow-hidden relative">
+                <div className="relative z-10">
+                  <h2 className="text-xl font-bold flex items-center gap-2 mb-4">
+                    <CheckCircle2 size={24} className="text-emerald-400" /> 배정 통계 결과
+                  </h2>
+                  <div className="space-y-4">
+                    {['조교', '동장', '봉사자', '직원'].map(role => {
+                      const roleStats = stats.filter(s => s.role === role);
+                      if (roleStats.length === 0) return null;
+                      return (
+                        <div key={role} className="space-y-2">
+                          <p className="text-xs font-bold text-indigo-300 uppercase tracking-widest">{role} 그룹</p>
+                          <div className="grid grid-cols-1 gap-2">
+                            {roleStats.map(s => (
+                              <div key={s.id} className="flex items-center justify-between bg-white/10 p-2 rounded-lg">
+                                <span className="text-sm font-medium">{s.name}</span>
+                                <div className="flex items-center gap-3">
+                                  <span className="text-xs bg-white/20 px-2 py-0.5 rounded text-indigo-100">이번 {s.sessionHours}h</span>
+                                  {['조교', '동장'].includes(role) && (
+                                    <span className="text-sm font-bold text-emerald-300">누적 {s.totalHours}h</span>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-indigo-800 rounded-full blur-3xl opacity-50"></div>
+              </section>
+            )}
+          </div>
+        </div>
+
+        {/* 결과 근무표 섹션 */}
+        {isGenerated && (
+          <section className="bg-white rounded-2xl shadow-sm border p-6 mt-8">
+            <h2 className="text-2xl font-bold text-center mb-8 border-b pb-4">최종 배정 근무표</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {slots.map(slot => {
+                const assignedStaffId = assignments[slot.id];
+                const staff = staffs.find(s => s.id === assignedStaffId);
+                
+                return (
+                  <div key={slot.id} className={`p-5 rounded-2xl border-2 transition-all ${assignedStaffId === 'unassigned' ? 'border-red-100 bg-red-50' : 'border-indigo-50 bg-white hover:shadow-md'}`}>
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <p className="text-xs text-slate-400 font-bold">{slot.date}</p>
+                        <p className="text-lg font-bold text-indigo-900">{slot.task || '(업무명 없음)'}</p>
+                      </div>
+                      <div className="bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase">
+                        {slot.requiredRole}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-500 text-sm mb-4">
+                      <Clock size={14} /> {slot.time || '시간 미지정'}
+                    </div>
+                    <div className="flex items-center gap-3 pt-3 border-t">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-sm ${assignedStaffId === 'unassigned' ? 'bg-slate-300' : 'bg-gradient-to-br from-indigo-500 to-purple-600'}`}>
+                        {staff ? staff.name[0] : '?'}
+                      </div>
+                      <div>
+                        {assignedStaffId === 'unassigned' ? (
+                          <div className="flex items-center gap-1 text-red-500 font-bold">
+                            <AlertCircle size={16} /> 배정 실패
+                          </div>
+                        ) : slot.requiredRole === '없음' ? (
+                          <span className="text-slate-400 font-medium italic">필수 인원 없음</span>
+                        ) : (
+                          <>
+                            <p className="font-bold text-slate-800">{staff?.name}</p>
+                            <p className="text-[10px] text-slate-400 uppercase">{staff?.role}</p>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+      </div>
+      
+      {/* 커스텀 스크롤바 스타일 */}
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+      `}</style>
+    </div>
+  );
+}
