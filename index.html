@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>즐거운 일본어 수업 - 히라가나와 문화</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        // Tailwind dark mode configuration
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', 'Noto Sans JP', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+        }
+        .dark .hero-gradient {
+            background: linear-gradient(135deg, #434343 0%, #000000 100%);
+        }
+        .card-hover:hover {
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+        .kana-box {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .kana-box:hover {
+            background-color: #ffe4e6;
+            transform: scale(1.1);
+        }
+        .dark .kana-box:hover {
+            background-color: #374151;
+        }
+        #culture-image {
+            transition: opacity 0.5s ease-in-out;
+        }
+        /* Mode Toggle Button Style */
+        .mode-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 100;
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+    <!-- Theme Toggle Button -->
+    <button onclick="toggleDarkMode()" class="mode-toggle bg-white dark:bg-gray-800 text-gray-800 dark:text-yellow-400 border border-gray-200 dark:border-gray-700">
+        <span id="theme-icon" class="text-xl">🌙</span>
+    </button>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm border-b border-gray-100 dark:border-gray-800">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-red-500">🌸 일본어 교실</h1>
+            <div class="space-x-8 hidden md:flex">
+                <a href="#home" class="hover:text-red-500 transition">홈</a>
+                <a href="#alphabet" class="hover:text-red-500 transition">히라가나/카타카나</a>
+                <a href="#culture" class="hover:text-red-500 transition">일본 문화</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-gradient min-h-screen flex items-center justify-center pt-20">
+        <div class="text-center px-6 animate__animated animate__fadeIn">
+            <span class="bg-white/30 dark:bg-black/30 px-4 py-1 rounded-full text-sm font-bold text-red-600 dark:text-red-400 mb-4 inline-block shadow-sm">Welcome to Class</span>
+            <h2 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+                가깝고도 먼 나라,<br><span class="text-red-600 dark:text-red-400">일본</span>의 언어와 문화를 배워요
+            </h2>
+            <p class="text-lg text-gray-700 dark:text-gray-300 mb-10 max-w-2xl mx-auto">
+                기초 문자부터 흥미로운 문화까지, 선생님과 함께 쉽고 재미있게 시작해 볼까요?
+            </p>
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <a href="#alphabet" class="bg-red-500 text-white px-8 py-3 rounded-full font-bold hover:bg-red-600 transition shadow-lg">문자 시작하기</a>
+                <a href="#culture" class="bg-white dark:bg-gray-800 text-red-500 dark:text-red-400 px-8 py-3 rounded-full font-bold hover:bg-gray-100 dark:hover:bg-gray-700 transition shadow-lg border border-transparent dark:border-gray-700">문화 탐방하기</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Alphabet Section -->
+    <section id="alphabet" class="py-24 bg-white dark:bg-gray-900 transition-colors duration-300">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h3 class="text-3xl font-bold mb-4 italic">Learn the Letters</h3>
+                <p class="text-gray-500 dark:text-gray-400">일본어의 기초, 두 가지 문자를 비교해 보세요.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12">
+                <!-- Hiragana -->
+                <div class="p-8 bg-rose-50 dark:bg-gray-800 rounded-3xl border border-rose-100 dark:border-gray-700 shadow-sm card-hover">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-rose-500 rounded-full flex items-center justify-center text-white text-xl font-bold mr-4">あ</div>
+                        <h4 class="text-2xl font-bold">히라가나 (ひらがな)</h4>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 mb-6">부드러운 곡선이 특징이며, 일본어의 가장 기본적인 문자입니다. 일반적인 단어나 문법 요소를 적을 때 사용해요.</p>
+                    <div class="grid grid-cols-5 gap-3 text-center">
+                        <div class="kana-box p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-rose-200 dark:border-gray-600 font-bold text-xl text-rose-600 dark:text-rose-400">あ</div>
+                        <div class="kana-box p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-rose-200 dark:border-gray-600 font-bold text-xl text-rose-600 dark:text-rose-400">い</div>
+                        <div class="kana-box p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-rose-200 dark:border-gray-600 font-bold text-xl text-rose-600 dark:text-rose-400">う</div>
+                        <div class="kana-box p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-rose-200 dark:border-gray-600 font-bold text-xl text-rose-600 dark:text-rose-400">え</div>
+                        <div class="kana-box p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-rose-200 dark:border-gray-600 font-bold text-xl text-rose-600 dark:text-rose-400">お</div>
+                    </div>
+                </div>
+
+                <!-- Katakana -->
+                <div class="p-8 bg-blue-50 dark:bg-gray-800 rounded-3xl border border-blue-100 dark:border-gray-700 shadow-sm card-hover">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl font-bold mr-4">ア</div>
+                        <h4 class="text-2xl font-bold">카타카나 (カタカナ)</h4>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 mb-6">각진 모양이 특징이며, 주로 외래어나 의성어/의태어, 강조하고 싶은 단어를 적을 때 사용해요.</p>
+                    <div class="grid grid-cols-5 gap-3 text-center">
+                        <div class="kana-box p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-blue-200 dark:border-gray-600 font-bold text-xl text-blue-600 dark:text-blue-400">ア</div>
+                        <div class="kana-box p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-blue-200 dark:border-gray-600 font-bold text-xl text-blue-600 dark:text-blue-400">イ</div>
+                        <div class="kana-box p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-blue-200 dark:border-gray-600 font-bold text-xl text-blue-600 dark:text-blue-400">ウ</div>
+                        <div class="kana-box p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-blue-200 dark:border-gray-600 font-bold text-xl text-blue-600 dark:text-blue-400">エ</div>
+                        <div class="kana-box p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-blue-200 dark:border-gray-600 font-bold text-xl text-blue-600 dark:text-blue-400">オ</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Culture Section -->
+    <section id="culture" class="py-24 bg-gray-100 dark:bg-gray-800 transition-colors duration-300">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h3 class="text-3xl font-bold mb-4">Discover Japan</h3>
+                <p class="text-gray-500 dark:text-gray-400">일본의 독특한 문화를 키워드로 만나보세요.</p>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-6 mb-12">
+                <button onclick="showCulture('food')" id="btn-food" class="culture-tab px-8 py-2 rounded-full font-bold bg-white dark:bg-gray-700 shadow-md text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-gray-600 transition">🍜 음식 문화</button>
+                <button onclick="showCulture('matsuri')" id="btn-matsuri" class="culture-tab px-8 py-2 rounded-full font-bold bg-white dark:bg-gray-700 shadow-md text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-gray-600 transition">🏮 축제(마츠리)</button>
+                <button onclick="showCulture('manner')" id="btn-manner" class="culture-tab px-8 py-2 rounded-full font-bold bg-white dark:bg-gray-700 shadow-md text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-gray-600 transition">🤝 예절 문화</button>
+            </div>
+
+            <div id="culture-content" class="bg-white dark:bg-gray-900 p-8 md:p-12 rounded-[40px] shadow-xl min-h-[450px] flex items-center animate__animated animate__fadeIn border border-transparent dark:border-gray-800 transition-colors duration-300">
+                <div class="grid md:grid-cols-2 gap-10 items-center w-full">
+                    <div>
+                        <h4 class="text-3xl font-bold text-red-500 dark:text-red-400 mb-6" id="culture-title">맛있는 일본 요리</h4>
+                        <p class="text-lg leading-relaxed text-gray-600 dark:text-gray-300 mb-6" id="culture-desc">
+                            스시, 라멘, 타코야키 등 전 세계적으로 사랑받는 일본 음식들은 각 지역의 특색을 담고 있습니다. 신선한 재료 본연의 맛을 살리는 것이 일본 요리의 특징입니다.
+                        </p>
+                        <ul class="space-y-3" id="culture-list">
+                            <!-- List injected by JS -->
+                        </ul>
+                    </div>
+                    <div class="relative group">
+                        <div class="rounded-2xl overflow-hidden shadow-2xl transition-transform duration-500 group-hover:scale-105">
+                            <img id="culture-image" src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80" alt="일본 음식" class="w-full h-80 object-cover">
+                        </div>
+                        <div class="absolute -bottom-4 -right-4 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-lg text-xs text-gray-400 italic">
+                            Photo by Unsplash
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Quiz Banner -->
+    <section class="py-12 bg-red-500 dark:bg-red-600 text-white text-center transition-colors duration-300">
+        <h3 class="text-2xl font-bold mb-4">학습 내용을 확인해 볼까요?</h3>
+        <p class="mb-6 opacity-90">선생님이 준비한 퀴즈 시간에 집중해 주세요!</p>
+        <a href="./01/index.html" class="inline-block bg-white dark:bg-gray-800 text-red-500 dark:text-red-400 px-10 py-3 rounded-full font-bold hover:scale-105 transition shadow-lg">퀴즈 시작 준비!</a>
+    </section>
+
+    <footer class="py-10 text-center text-gray-400 text-sm border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 transition-colors duration-300">
+        <p>© 2024 일본어 선생님의 즐거운 수업 교실. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Toggle Dark Mode Function
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.innerText = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                icon.innerText = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Check local storage for preference
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.getElementById('theme-icon').innerText = '☀️';
+        }
+
+        const cultureData = {
+            food: {
+                title: "맛있는 일본 요리 (和食)",
+                desc: "스시, 라멘, 타코야키 등 전 세계적으로 사랑받는 일본 음식들은 각 지역의 특색을 담고 있습니다. '와쇼쿠(和食)'는 유네스코 무형문화유산으로도 지정되었어요.",
+                list: ["계절에 따른 제철 재료 사용", "눈으로 먹는다고 할 정도의 시각적 즐거움", "지역별 고유한 명물 음식(메이부츠)"],
+                img: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80"
+            },
+            matsuri: {
+                title: "전통 축제 (祭り)",
+                desc: "일본 전역에서 열리는 마츠리는 신에게 감사를 표하거나 지역의 안녕을 비는 행사입니다. 화려한 가마(미코시)와 유카타를 입은 사람들을 볼 수 있어요.",
+                list: ["여름의 상징 유카타와 부채", "밤하늘을 수놓는 불꽃놀이(하나비)", "다양한 길거리 음식(야타이)"],
+                img: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80"
+            },
+            manner: {
+                title: "배려의 문화 (礼儀)",
+                desc: "일본은 상대방에게 폐를 끼치지 않는다는 '메이와쿠' 개념과 예의를 중요시합니다. 인사(오지기)의 각도에 따라 그 의미가 달라지기도 합니다.",
+                list: ["식사 전후 인사의 중요성", "공공장소에서의 정숙함", "상대방을 배려하는 마음 (오모테나시)"],
+                img: "https://images.unsplash.com/photo-1490806678282-441857c6609c?auto=format&fit=crop&w=800&q=80"
+            }
+        };
+
+        function showCulture(type) {
+            const content = document.getElementById('culture-content');
+            const data = cultureData[type];
+            
+            // Animation for text
+            content.classList.remove('animate__fadeIn');
+            void content.offsetWidth; 
+            content.classList.add('animate__fadeIn');
+
+            // Update UI Text
+            document.getElementById('culture-title').innerText = data.title;
+            document.getElementById('culture-desc').innerText = data.desc;
+            
+            const listContainer = document.getElementById('culture-list');
+            listContainer.innerHTML = data.list.map(item => `
+                <li class="flex items-center"><span class="text-red-500 dark:text-red-400 mr-2 font-bold">✔</span> ${item}</li>
+            `).join('');
+
+            // Update Image with Fade Effect
+            const imgElement = document.getElementById('culture-image');
+            imgElement.style.opacity = 0;
+            setTimeout(() => {
+                imgElement.src = data.img;
+                imgElement.style.opacity = 1;
+            }, 100);
+
+            // Update tab styles
+            document.querySelectorAll('.culture-tab').forEach(btn => {
+                btn.classList.remove('bg-red-500', 'text-white', 'dark:bg-red-600');
+                btn.classList.add('bg-white', 'text-gray-600', 'dark:bg-gray-700', 'dark:text-gray-300');
+            });
+            const activeBtn = document.getElementById('btn-' + type);
+            activeBtn.classList.remove('bg-white', 'text-gray-600', 'dark:bg-gray-700', 'dark:text-gray-300');
+            activeBtn.classList.add('bg-red-500', 'text-white', 'dark:bg-red-600');
+        }
+
+        // Initialize with food
+        window.onload = () => showCulture('food');
+    </script>
+</body>
+</html>
